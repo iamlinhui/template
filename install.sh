@@ -16,6 +16,7 @@ Font="\033[0m"
 #notification information
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
+Info="${Green}[信息]${Font}"
 
 nginx_conf_dir="/etc/nginx/conf.d"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
@@ -41,11 +42,11 @@ check_system(){
         echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
         ## Centos 也可以通过添加 epel 仓库来安装，目前不做改动
         cat>/etc/yum.repos.d/nginx.repo<<EOF
-        [nginx]
-        name=nginx repo
-        baseurl=http://nginx.org/packages/mainline/centos/7/\$basearch/
-        gpgcheck=0
-        enabled=1
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/mainline/centos/7/\$basearch/
+gpgcheck=0
+enabled=1
 EOF
         echo -e "${OK} ${GreenBG} Nginx 源 安装完成 ${Font}"
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
