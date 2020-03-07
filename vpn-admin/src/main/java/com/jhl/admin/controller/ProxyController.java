@@ -24,6 +24,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
@@ -56,14 +57,16 @@ public class ProxyController {
      */
     @ResponseBody
     @GetMapping("/proxyAccount/ac")
-    public Result getPAccount(String accountNo,String domain) {
+    public Result getPAccount(@RequestParam String accountNo, @RequestParam String domain) {
        // log.info("account no is:,{}", accountNo);
         if ( StringUtils.isBlank(accountNo)||StringUtils.isBlank(domain) ) {
             return Result.builder().code(500).message("accountNo/domain is null").build();
         }
 
         Account account = accountRepository.findOne(Example.of(Account.builder().accountNo(accountNo).status(1).build())).orElse(null);
-        if (account == null) return Result.builder().code(500).message("账号不存在").build();
+        if (account == null) {
+            return Result.builder().code(500).message("账号不存在").build();
+        }
         //check date
         if (!account.getToDate().after(new Date())) {
             log.warn("账号到期,不能获取:{},{}", accountNo, Utils.formatDate(account.getToDate(), null));

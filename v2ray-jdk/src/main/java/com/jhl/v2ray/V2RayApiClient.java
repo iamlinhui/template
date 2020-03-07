@@ -32,7 +32,9 @@ public class V2RayApiClient {
 
     public static V2RayApiClient getInstance(String host, int port) {
         String key = host + port;
-        if (concurrentHashMap.containsKey(key)) return concurrentHashMap.get(key);
+        if (concurrentHashMap.containsKey(key)) {
+            return concurrentHashMap.get(key);
+        }
         synchronized (key.intern()) {
             if (!concurrentHashMap.containsKey(key)) {
                 ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).executor(SINGLE_POLL)
