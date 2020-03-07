@@ -350,6 +350,7 @@ port_exist_check(){
     fi
 }
 acme() {
+    systemctl stop firewalld.service
     if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone -k ec-256 --force --test; then
         echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
         rm -rf "$HOME/.acme.sh/${domain}_ecc"
