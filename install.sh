@@ -191,7 +191,7 @@ web_camouflage(){
     cd /opt/template
     mvn clean package -Dmaven.test.skip=true
     mv /opt/template/vpn-admin/target/*.jar /opt/jar/admin.jar
-    mv /opt/template/proxy/target/*.jar /opt/jar/proxy.jar
+    mv /opt/template/proxy/target/*.jar /opt/jar/v2ray-proxy.jar
     mv /opt/template/conf/*.yaml /opt/jar
 
     # shellcheck disable=SC2164
