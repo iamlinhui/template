@@ -141,7 +141,7 @@ chrony_install() {
 }
 
 dependency_install(){
-    ${INS} install wget git lsof -y
+    ${INS} install wget git lsof bzip2 pcre pcre-devel zlib-devel epel-release haveged -y
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install crontabs
@@ -203,17 +203,21 @@ web_camouflage(){
     judge "git 项目编译完成"
 }
 v2ray_install(){
-    if [[ -d /root/v2ray ]];then
+    if [[ -d /root/v2ray ]]; then
         rm -rf /root/v2ray
     fi
-
-    # shellcheck disable=SC2164
-    mkdir -p /root/v2ray && cd /root/v2ray
-    wget  --no-check-certificate https://install.direct/go.sh
+    if [[ -d /etc/v2ray ]]; then
+        rm -rf /etc/v2ray
+    fi
+    mkdir -p /root/v2ray
+    cd /root/v2ray || exit
+    wget -N --no-check-certificate https://install.direct/go.sh
 
     ## wget http://install.direct/go.sh
 
-    if [[ -f go.sh ]];then
+    if [[ -f go.sh ]]; then
+        rm -rf $v2ray_systemd_file
+        systemctl daemon-reload
         bash go.sh --force
         judge "安装 V2ray"
     else
@@ -226,74 +230,25 @@ v2ray_install(){
 }
 
 nginx_install() {
-    #    if [[ -d "/etc/nginx" ]];then
-    #        rm -rf /etc/nginx
-    #    fi
-
-    wget -nc --no-check-certificate http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
-    judge "Nginx 下载"
-    wget -nc --no-check-certificate https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
-    judge "openssl 下载"
-    wget -nc --no-check-certificate https://github.com/jemalloc/jemalloc/releases/download/${jemalloc_version}/jemalloc-${jemalloc_version}.tar.bz2 -P ${nginx_openssl_src}
-    judge "jemalloc 下载"
-
-    cd ${nginx_openssl_src} || exit
-
-    [[ -d nginx-"$nginx_version" ]] && rm -rf nginx-"$nginx_version"
-    tar -zxvf nginx-"$nginx_version".tar.gz
-
-    [[ -d openssl-"$openssl_version" ]] && rm -rf openssl-"$openssl_version"
-    tar -zxvf openssl-"$openssl_version".tar.gz
-
-    [[ -d jemalloc-"${jemalloc_version}" ]] && rm -rf jemalloc-"${jemalloc_version}"
-    tar -xvf jemalloc-"${jemalloc_version}".tar.bz2
-
-    [[ -d "$nginx_dir" ]] && rm -rf ${nginx_dir}
-
-    echo -e "${OK} ${GreenBG} 即将开始编译安装 jemalloc ${Font}"
-    sleep 2
-
-    cd jemalloc-${jemalloc_version} || exit
-    ./configure
-    judge "编译检查"
-    make && make install
-    judge "jemalloc 编译安装"
-    echo '/usr/local/lib' >/etc/ld.so.conf.d/local.conf
-    ldconfig
-
-    echo -e "${OK} ${GreenBG} 即将开始编译安装 Nginx, 过程稍久，请耐心等待 ${Font}"
-    sleep 4
-
-    cd ../nginx-${nginx_version} || exit
-
-    ./configure --prefix="${nginx_dir}" \
-        --with-http_ssl_module \
-        --with-http_gzip_static_module \
-        --with-http_stub_status_module \
-        --with-pcre \
-        --with-http_realip_module \
-        --with-http_flv_module \
-        --with-http_mp4_module \
-        --with-http_secure_link_module \
-        --with-http_v2_module \
-        --with-cc-opt='-O3' \
-        --with-ld-opt="-ljemalloc" \
-        --with-openssl=../openssl-"$openssl_version"
-    judge "编译检查"
-    make && make install
-    judge "Nginx 编译安装"
+    ${INS} install nginx -y
+    if [[ -d /etc/nginx ]];then
+        echo -e "${OK} ${GreenBG} nginx 安装完成 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} nginx 安装失败 ${Font}"
+        exit 5
+    fi
+    if [[ ! -f /etc/nginx/nginx.conf.bak ]];then
+        cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+        echo -e "${OK} ${GreenBG} nginx 初始配置备份完成 ${Font}"
+        sleep 1
+    fi
 
     # 修改基本配置
     sed -i 's/#user  nobody;/user  root;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/worker_processes  1;/worker_processes  3;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/    worker_connections  1024;/    worker_connections  4096;/' ${nginx_dir}/conf/nginx.conf
     sed -i '$i include conf.d/*.conf;' ${nginx_dir}/conf/nginx.conf
-
-    # 删除临时文件
-    rm -rf ../nginx-"${nginx_version}"
-    rm -rf ../openssl-"${openssl_version}"
-    rm -rf ../nginx-"${nginx_version}".tar.gz
-    rm -rf ../openssl-"${openssl_version}".tar.gz
 
     # 添加配置文件夹，适配旧版脚本
     mkdir ${nginx_dir}/conf/conf.d
@@ -394,7 +349,7 @@ nginx_conf_add(){
       ssl_certificate       /etc/nginx/v2ray.crt;
       ssl_certificate_key   /etc/nginx/v2ray.key;
       ssl_protocols TLSv1.1 TLSv1.2 TLSv1.3;
-      ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;;
+      ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
 
 
       location /api {
@@ -463,20 +418,20 @@ show_information(){
 main(){
     is_root
     check_system
-    chrony_install
-    dependency_install
+    #chrony_install
+    #dependency_install
     domain_check
-    v2ray_install
-    port_exist_check 443
-    port_exist_check 9091
-    port_exist_check 6001
-    port_exist_check 8081
-    port_exist_check 8091
-    nginx_install
+    #v2ray_install
+    #port_exist_check 443
+    #port_exist_check 9091
+    #port_exist_check 6001
+    #port_exist_check 8081
+    #port_exist_check 8091
+    #nginx_install
 
-    web_camouflage
-    v2ray_conf_add
-    nginx_conf_add
+    #web_camouflage
+    #v2ray_conf_add
+    #nginx_conf_add
 
     #改变证书安装位置，防止端口冲突关闭相关应用
     systemctl stop nginx
