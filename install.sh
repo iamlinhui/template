@@ -408,9 +408,10 @@ acme_cron_update(){
     judge "cron 计划任务更新"
 }
 show_information(){
+    systemctl start firewalld.service
+    firewall-cmd --list-port
     firewall-cmd --zone=public --add-port=443/tcp --permanent
     firewall-cmd --reload
-    systemctl start firewalld.service
     clear
     echo -e "${OK} ${Green} 安装成功 "
 }
