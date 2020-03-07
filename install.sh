@@ -199,7 +199,7 @@ web_camouflage(){
     npm run build:prod
     mv /opt/template-console/dist /opt/jar/web
 
-    judge "web 站点伪装"
+    judge "git 项目编译完成"
 }
 v2ray_install(){
     if [[ -d /root/v2ray ]];then
@@ -336,6 +336,7 @@ domain_check(){
 }
 
 port_exist_check(){
+    # shellcheck disable=SC2006
     if [[ 0 -eq `lsof -i:"$1" | wc -l` ]];then
         echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
         sleep 1
