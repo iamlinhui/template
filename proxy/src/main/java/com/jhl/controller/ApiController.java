@@ -25,7 +25,9 @@ public class ApiController {
     @PostMapping(value = "/account/del")
     public Result rmAccount(@RequestBody ProxyAccount proxyAccount) {
         try {
-            if (proxyAccount == null) return Result.builder().code(405).message("accountNo 为空").build();
+            if (proxyAccount == null) {
+                return Result.builder().code(405).message("accountNo 为空").build();
+            }
             String accountNo = proxyAccount.getAccountNo();
             proxyAccountCache.rmProxyAccountCache(accountNo,proxyAccount.getHost());
             v2rayService.rmProxyAccount(proxyAccount.getV2rayHost(), proxyAccount.getV2rayManagerPort(), proxyAccount);
