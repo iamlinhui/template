@@ -35,11 +35,13 @@ public class V2RayProxyEvent implements ProxyEvent {
     }
 
 
+    @Override
     @Deprecated
     public void updateEvent() {
         createEvent();
     }
 
+    @Override
     public void rmEvent() {
         List<String> urls = buildProxyServerUrl();
 
