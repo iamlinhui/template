@@ -55,6 +55,7 @@ public final class ProxyServer {
                     .channel(NioServerSocketChannel.class)
                     //    .handler(new LoggingHandler(LogLevel.ERROR))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(new Dispatcher(proxyConstant,trafficControllerService,proxyAccountCache, connectionStatsService));
                         }

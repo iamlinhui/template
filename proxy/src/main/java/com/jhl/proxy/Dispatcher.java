@@ -88,8 +88,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
 
             } catch (Exception e) {
                 log.warn("解析阶段发生错误:{},e:{}", ((ByteBuf) msg).toString(Charset.defaultCharset()), e.getLocalizedMessage());
-                if (handshakeByteBuf != null)
+                if (handshakeByteBuf != null) {
                     ReferenceCountUtil.release(handshakeByteBuf);
+                }
                 closeOnFlush(ctx.channel());
                 return;
             } finally {
@@ -169,7 +170,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
         //50001:token/
         String[] accountNoAndToken = requestRow[1].split("/")[2].split(":");
 
-        if (accountNoAndToken.length < 2) throw new UnsupportedOperationException("旧版接入不在支持");
+        if (accountNoAndToken.length < 2) {
+            throw new UnsupportedOperationException("旧版接入不在支持");
+        }
 
         accountNo = accountNoAndToken[0];
 
@@ -337,13 +340,17 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
             closeOnFlush(outboundChannel);
         }
 
-        if (accountNo == null) return;
+        if (accountNo == null) {
+            return;
+        }
         //减少channel 引用计数
         int accountConnections = connectionStatsService.decrementAndGet(getAccountId());
         log.info("关闭当前连接数后->account:{},：{}", getAccountId(), accountConnections);
 
         GlobalTrafficShapingHandler globalTrafficShapingHandler = trafficControllerService.getGlobalTrafficShapingHandler(getAccountId());
-        if (globalTrafficShapingHandler == null) return;
+        if (globalTrafficShapingHandler == null) {
+            return;
+        }
         TrafficCounter trafficCounter = globalTrafficShapingHandler.trafficCounter();
         if (accountConnections < 1) {
             long writtenBytes = trafficCounter.cumulativeWrittenBytes();

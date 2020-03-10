@@ -142,11 +142,15 @@ public class ProxyAccountCache {
 
         ProxyAccountWrapper proxyAccountWrapper = PA_MAP.getIfPresent(getKey(accountNo, host));
 
-        if (proxyAccountWrapper == null) return true;
+        if (proxyAccountWrapper == null) {
+            return true;
+        }
 
         Long pxVersion = proxyAccountWrapper.getVersion();
 
-        if (pxVersion != null && pxVersion.equals(ctxContextVersion)) return false;
+        if (pxVersion != null && pxVersion.equals(ctxContextVersion)) {
+            return false;
+        }
 
         return true;
     }
