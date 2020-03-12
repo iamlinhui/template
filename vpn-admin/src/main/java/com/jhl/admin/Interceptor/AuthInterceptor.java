@@ -1,8 +1,8 @@
 package com.jhl.admin.Interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.jhl.admin.VO.UserVO;
 import com.jhl.admin.cache.UserCache;
-import com.jhl.admin.model.User;
 import com.ljh.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         //无需要认证
         if (preAuth ==null) return  true;
         String token= getAuthCookie(request);
-        User userCache = (User)this.userCache.getCache(token);
+        UserVO userCache = this.userCache.getCache(token);
         //重新登录
         if (token ==null || userCache ==null) {
             Result<Object> result = Result.builder().code(403).message("请重新登录").build();

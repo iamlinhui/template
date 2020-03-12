@@ -42,7 +42,6 @@ spring:
       maximum-pool-size: 5
       minimum-idle: 2
     password: ''
-    type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:sqlite:/opt/jar/db/admin.db
     username: ''
   jackson:

@@ -1,13 +1,13 @@
 package com.jhl.admin.controller;
 
 import com.jhl.admin.Interceptor.PreAuth;
+import com.jhl.admin.VO.NoticeVO;
 import com.jhl.admin.model.Notice;
 import com.jhl.admin.repository.NoticeRepository;
 import com.ljh.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class NoticeController {
     @PreAuth("admin")
     @ResponseBody
     @PostMapping("/notice")
-    public Result createNotice(@RequestBody Notice notice) {
+    public Result createNotice(@RequestBody NoticeVO notice) {
         addOrUpdate(notice);
         return Result.SUCCESS();
     }
@@ -41,7 +41,7 @@ public class NoticeController {
     @PreAuth("admin")
     @ResponseBody
     @PutMapping("/notice")
-    public Result updateNotice(@RequestBody Notice notice) {
+    public Result updateNotice(@RequestBody NoticeVO notice) {
         addOrUpdate(notice);
         return Result.SUCCESS();
     }
@@ -71,7 +71,7 @@ public class NoticeController {
         if (id ==null)   throw new NullPointerException("id不能为空");
         Notice notice = noticeRepository.findById(id).orElse(null);
 
-        return Result.buildSuccess(notice,null);
+        return Result.buildSuccess(notice.toVO(NoticeVO.class),null);
     }
 
     /**
@@ -87,7 +87,7 @@ public class NoticeController {
     }
 
 
-    private void addOrUpdate(@RequestBody Notice notice) {
+    private void addOrUpdate(@RequestBody NoticeVO notice) {
         if (notice == null) throw new NullPointerException("不能为空");
         if (StringUtils.isBlank(notice.getContent())
                 || StringUtils.isBlank(notice.getName())
@@ -97,6 +97,6 @@ public class NoticeController {
             log.warn("notice:{}", notice);
             if (notice == null) throw new NullPointerException("不能为空");
         }
-        noticeRepository.save(notice);
+        noticeRepository.save(notice.toModel(Notice.class));
     }
 }

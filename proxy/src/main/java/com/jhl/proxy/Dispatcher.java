@@ -68,7 +68,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
+       // log.info("Dispatcher len:"+((ByteBuf)msg).readableBytes()+"B");
         if (isHandshaking) {
+
             /**
              * PooledUnsafeDirectByteBuf(ridx: 0, widx: 188, cap: 1024)
              *
@@ -87,10 +89,10 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
                 handshakeByteBuf = parse(ctx, msg);
 
             } catch (Exception e) {
-                log.warn("解析阶段发生错误:{},e:{}", ((ByteBuf) msg).toString(Charset.defaultCharset()), e.getLocalizedMessage());
-                if (handshakeByteBuf != null) {
+                if (!(e instanceof ReleaseDirectMemoryException))
+                    log.warn("解析阶段发生错误:{},e:{}", ((ByteBuf) msg).toString(Charset.defaultCharset()), e.getLocalizedMessage());
+                if (handshakeByteBuf != null)
                     ReferenceCountUtil.release(handshakeByteBuf);
-                }
                 closeOnFlush(ctx.channel());
                 return;
             } finally {
@@ -104,7 +106,7 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
                 // 获取proxyAccount
                 ProxyAccountWrapper proxyAccount = getProxyAccount();
 
-                if (proxyAccount == null || isConnectionFull(proxyAccount)) {
+                if (proxyAccount == null || isFull(proxyAccount)) {
                     ReferenceCountUtil.release(handshakeByteBuf);
                     closeOnFlush(ctx.channel());
                     return;
@@ -125,11 +127,8 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
 
         } else {
             try {
-                if (outboundChannel.isActive()) {
-                    writeToOutBoundChannel(msg, ctx);
-                }
+                writeToOutBoundChannel(msg, ctx);
             } catch (Exception e) {
-
                 if (!(e instanceof ReleaseDirectMemoryException)) {
                     log.error("数据交互发生异常：{}", e);
                 }
@@ -170,9 +169,7 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
         //50001:token/
         String[] accountNoAndToken = requestRow[1].split("/")[2].split(":");
 
-        if (accountNoAndToken.length < 2) {
-            throw new UnsupportedOperationException("旧版接入不在支持");
-        }
+        if (accountNoAndToken.length < 2) throw new NullPointerException("旧版接入不在支持");
 
         accountNo = accountNoAndToken[0];
 
@@ -197,7 +194,7 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
      * @param proxyAccount ProxyAccount
      * @return true is full
      */
-    private boolean isConnectionFull(ProxyAccount proxyAccount) {
+    private boolean isFull(ProxyAccount proxyAccount) {
         int connections = connectionStatsService.incrementAndGet(getAccountId());
         log.info("当前连接数account:{},{}", getAccountId(), connections);
         int maxConnection = ConnectionLimitCache.containKey(getAccountId()) ? Integer.valueOf(proxyAccount.getMaxConnection() / 2) : proxyAccount.getMaxConnection();
@@ -270,7 +267,11 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
                 .channel(NioSocketChannel.class)
                 .handler(new Receiver(inboundChannel))
                 .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
-                .option(ChannelOption.AUTO_READ, false);
+                .option(ChannelOption.AUTO_READ, false)
+                .option(ChannelOption.SO_SNDBUF, 32 * 1024)
+                .option(ChannelOption.SO_RCVBUF, 32 * 1024)
+                //32k/64k
+                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark.DEFAULT);
         return b;
 
 
@@ -326,6 +327,7 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
             throw new ReleaseDirectMemoryException("【当前版本已经更新】抛出异常。统一内存释放");
         }
         outboundChannel.writeAndFlush(msg).addListener((ChannelFutureListener) future -> {
+            release((ByteBuf) msg);
             if (future.isSuccess()) {
                 ctx.channel().read();
             } else {

@@ -3,7 +3,6 @@ package com.jhl.admin.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,7 +10,6 @@ import java.io.Serializable;
 
 @Entity
 @Builder
-@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "t_transaction")
