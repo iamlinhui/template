@@ -12,6 +12,7 @@ import com.jhl.v2ray.service.V2rayService;
 import com.ljh.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -71,10 +72,14 @@ public class ProxyAccountCache {
             synchronized (SynchronizedInternerUtils.getInterner().intern(getKey(accountNo, host + ":getRemotePAccount"))) {
 
                 proxyAccount = PA_MAP.getIfPresent(getKey(accountNo, host));
-                if (proxyAccount != null) return proxyAccount;
+                if (proxyAccount != null) {
+                    return proxyAccount;
+                }
                 //远程请求，获取信息
                 proxyAccount = getRemotePAccount(accountNo, host);
-                if (proxyAccount !=null)proxyAccount.setVersion(System.currentTimeMillis());
+                if (proxyAccount !=null) {
+                    proxyAccount.setVersion(System.currentTimeMillis());
+                }
                 //如果获取不到账号，增加错误次数
                 if (proxyAccount == null) {
                     AtomicInteger counter = REQUEST_ERROR_COUNT.getIfPresent(accountNo);
@@ -118,7 +123,7 @@ public class ProxyAccountCache {
             return null;
         }
         Result result = entity.getBody();
-        if (result.getCode() != 200) {
+        if (result.getCode() != HttpStatus.OK.value()) {
             log.warn("getRemotePAccount  error:{}", JSON.toJSONString(result));
             return null;
         }

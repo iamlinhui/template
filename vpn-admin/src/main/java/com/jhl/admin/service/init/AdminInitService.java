@@ -38,7 +38,9 @@ public class AdminInitService {
     public void init() {
         ServerConfig initialedConfig = serverConfigRepository.findOne(Example.of(ServerConfig.builder().key("initialed").build())).orElse(null);
 
-        if (initialedConfig != null && Boolean.valueOf(initialedConfig.getValue())) return;
+        if (initialedConfig != null && Boolean.parseBoolean(initialedConfig.getValue())) {
+            return;
+        }
         //todo 新增一个管理员账号
         User user = User.builder().email(email).password(DigestUtils.md5Hex(password)).nickName("admin").role("admin").status(1).build();
         userService.create(user);
