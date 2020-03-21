@@ -1,4 +1,4 @@
-package com.jhl.cache;
+package com.jhl.service;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
@@ -6,13 +6,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.jhl.constant.ManagerConstant;
 import com.jhl.pojo.ProxyAccountWrapper;
-import com.jhl.service.ConnectionStatsService;
 import com.jhl.utils.SynchronizedInternerUtils;
 import com.jhl.v2ray.service.V2rayService;
 import com.ljh.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Component
-public class ProxyAccountCache {
+public class ProxyAccountService {
 
     @Autowired
     ManagerConstant managerConstant;
@@ -34,14 +32,14 @@ public class ProxyAccountCache {
     RestTemplate restTemplate;
     @Autowired
     V2rayService v2rayService;
-   
+
     private static final Short BEGIN_BLOCK = 3;
     /**
      * 缓存 ProxyAccount
      * key:getKey(accountNo, host)
      * value: ProxyAccount
      */
-    public  static  Integer ACCOUNT_EXPIRE_TIME=60;
+    public static Integer ACCOUNT_EXPIRE_TIME = 60;
     private final Cache<String, ProxyAccountWrapper> PA_MAP = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(ACCOUNT_EXPIRE_TIME, TimeUnit.MINUTES).build();
     /**
      * 屏蔽无限刷admin端
@@ -72,14 +70,10 @@ public class ProxyAccountCache {
             synchronized (SynchronizedInternerUtils.getInterner().intern(getKey(accountNo, host + ":getRemotePAccount"))) {
 
                 proxyAccount = PA_MAP.getIfPresent(getKey(accountNo, host));
-                if (proxyAccount != null) {
-                    return proxyAccount;
-                }
+                if (proxyAccount != null) return proxyAccount;
                 //远程请求，获取信息
                 proxyAccount = getRemotePAccount(accountNo, host);
-                if (proxyAccount !=null) {
-                    proxyAccount.setVersion(System.currentTimeMillis());
-                }
+                if (proxyAccount != null) proxyAccount.setVersion(System.currentTimeMillis());
                 //如果获取不到账号，增加错误次数
                 if (proxyAccount == null) {
                     AtomicInteger counter = REQUEST_ERROR_COUNT.getIfPresent(accountNo);
@@ -123,7 +117,7 @@ public class ProxyAccountCache {
             return null;
         }
         Result result = entity.getBody();
-        if (result.getCode() != HttpStatus.OK.value()) {
+        if (result.getCode() != 200) {
             log.warn("getRemotePAccount  error:{}", JSON.toJSONString(result));
             return null;
         }
@@ -145,24 +139,27 @@ public class ProxyAccountCache {
     }
 
     public boolean interrupted(String accountNo, String host, Long ctxContextVersion) {
+        boolean result = true;
+        try {
+            ProxyAccountWrapper proxyAccountWrapper = PA_MAP.getIfPresent(getKey(accountNo, host));
 
-        ProxyAccountWrapper proxyAccountWrapper = PA_MAP.getIfPresent(getKey(accountNo, host));
+            if (proxyAccountWrapper != null) {
+                Long pxVersion = proxyAccountWrapper.getVersion();
 
-        if (proxyAccountWrapper == null) {
-            return true;
+                if (pxVersion != null && pxVersion.equals(ctxContextVersion)) result = false;
+            }
+
+
+        } finally {
+            //移除cache
+            if (result) rmProxyAccountCache(accountNo, host);
         }
+        return result;
 
-        Long pxVersion = proxyAccountWrapper.getVersion();
-
-        if (pxVersion != null && pxVersion.equals(ctxContextVersion)) {
-            return false;
-        }
-
-        return true;
     }
 
-    public  Long getSize(){
-        return  PA_MAP.size();
+    public Long getSize() {
+        return PA_MAP.size();
     }
 
 }
