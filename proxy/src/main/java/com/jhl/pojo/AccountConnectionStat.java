@@ -18,12 +18,12 @@ public class AccountConnectionStat {
 
     //远程全局连接数
     // unsafe
-    private int remoteConnectionNum = 0;
+    private volatile  int remoteConnectionNum = 0;
     //上次上报的数量
     @Getter
     @Setter
     // unsafe
-    private int lastReportNum = 0;
+    private  volatile int lastReportNum = 0;
     //上次上报的时间
     @Getter
     @Setter
@@ -96,8 +96,10 @@ public class AccountConnectionStat {
     public int getByGlobal() {
         //小于5分钟内
         if (remoteConnectionNum > 0 && (System.currentTimeMillis() - lastReportTime) < _5MINUTE_MS) {
-            int remote = (remoteConnectionNum - lastReportNum);
-            return remote < 0 ? 0 : remote + getByServer();
+            synchronized (this) {
+                int remote = (remoteConnectionNum - lastReportNum);
+                return remote < 0 ? 0 : remote + getByServer();
+            }
         }
         return getByServer();
     }
