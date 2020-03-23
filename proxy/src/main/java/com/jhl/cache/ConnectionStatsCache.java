@@ -107,7 +107,8 @@ public class ConnectionStatsCache {
         return false;
     }
 
-    public static boolean canReport(String accountId) {
+    public static  boolean canReport(String accountId) {
+        synchronized (SynchronizedInternerUtils.getInterner().intern(accountId)){
         AccountConnectionStat connectionCounter = ACCOUNT_CONNECTION_COUNT_STATS.getIfPresent(accountId);
         if (connectionCounter != null) {
             long interruptionTime = connectionCounter.getInterruptionTime();
@@ -115,12 +116,12 @@ public class ConnectionStatsCache {
             //interruptionTime =0 ok
             // interruptionTime !=0 ok
             if ((System.currentTimeMillis() - interruptionTime) > _1HOUR_MS) {
-                // 设置最新的上报时间
                 connectionCounter.setInterruptionTime(System.currentTimeMillis());
                 return true;
             }
         }
         return false;
+        }
     }
 
     /**
@@ -129,11 +130,13 @@ public class ConnectionStatsCache {
      * @param accountNo
      * @param count
      */
-    public static void updateGlobalConnectionStat(String accountNo, int count) {
+    public static void updateGlobalConnectionStat(String accountNo, int count, long interruptionTime) {
         AccountConnectionStat connectionCounter = ACCOUNT_CONNECTION_COUNT_STATS.getIfPresent(accountNo);
         if (connectionCounter != null) {
             connectionCounter.updateRemoteConnectionNum(count);
         }
+        //全局控制
+        if (interruptionTime>0)  connectionCounter.setInterruptionTime(interruptionTime);
     }
 
     /**
