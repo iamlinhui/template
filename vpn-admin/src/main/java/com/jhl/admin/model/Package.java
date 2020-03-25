@@ -36,10 +36,10 @@ public class Package extends BaseEntity implements Serializable {
 
     private Integer price;
 
-    @Column(name = "packageShow")
+    @Column(name = "`show`")
     private  Integer show;
     //间隔
-    @Column(name = "packageInterval")
+    @Column(name = "`interval`")
     private  Integer interval;
 
     /**

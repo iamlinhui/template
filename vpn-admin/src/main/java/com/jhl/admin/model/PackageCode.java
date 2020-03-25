@@ -16,12 +16,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 public class PackageCode extends BaseEntity implements Serializable {
-    @Column(unique = true,name = "packageCode")
+    @Column(unique = true)
     private String code;
     //code 的有效时间
     private Date expire;
     //说明
-    @Column(name = "packageDescribe")
+    @Column(name = "`desc`")
     private String desc;
     /**
      * -1: 失效

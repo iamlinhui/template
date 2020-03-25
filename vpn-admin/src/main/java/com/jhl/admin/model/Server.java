@@ -41,7 +41,7 @@ public class Server extends BaseEntity implements Serializable {
     private Double multiple;
 
     //说明
-    @Column(name = "serverDescribe")
+    @Column(name = "`desc`")
     private String desc;
     //服务器状态
     private Integer status;
@@ -51,7 +51,7 @@ public class Server extends BaseEntity implements Serializable {
     /**
      * 服务器等级
      */
-    @Column(name = "serverLevel", columnDefinition="smallint default 0")
+    @Column(columnDefinition="smallint default 0")
     private  Short level;
 
 
