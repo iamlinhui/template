@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Columns;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ public class Server extends BaseEntity implements Serializable {
     private Double multiple;
 
     //说明
+    @Column(name = "serverDescribe")
     private String desc;
     //服务器状态
     private Integer status;
@@ -49,7 +51,7 @@ public class Server extends BaseEntity implements Serializable {
     /**
      * 服务器等级
      */
-    @Column(  columnDefinition="smallint default 0")
+    @Column(name = "serverLevel", columnDefinition="smallint default 0")
     private  Short level;
 
 

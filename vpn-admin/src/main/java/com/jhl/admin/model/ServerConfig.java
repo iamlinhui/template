@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 public class ServerConfig extends BaseEntity implements Serializable {
-    @Column(unique = true,nullable = false)
+    @Column(unique = true,nullable = false,name = "configKey")
     private String key;
 
     private String name;

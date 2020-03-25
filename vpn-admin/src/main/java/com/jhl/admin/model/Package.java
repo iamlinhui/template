@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.io.Serializable;
 
@@ -27,6 +28,7 @@ public class Package extends BaseEntity implements Serializable {
      *0 1 30
      */
     private Integer cycle;
+
     //说明
     private String description;
 
@@ -34,8 +36,10 @@ public class Package extends BaseEntity implements Serializable {
 
     private Integer price;
 
+    @Column(name = "packageShow")
     private  Integer show;
     //间隔
+    @Column(name = "packageInterval")
     private  Integer interval;
 
     /**
