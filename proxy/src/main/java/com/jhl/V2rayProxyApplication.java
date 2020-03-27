@@ -25,8 +25,7 @@ public class V2rayProxyApplication {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().removeIf(httpMessageConverter -> {
             String name = httpMessageConverter.getClass().getName();
-            if (name.contains("json")) return true;
-            else return false;
+            return name.contains("json");
         });
         restTemplate.getMessageConverters().add(fastJsonHttpMessageConverter);
         return restTemplate;
