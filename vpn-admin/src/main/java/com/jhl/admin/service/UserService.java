@@ -1,6 +1,6 @@
 package com.jhl.admin.service;
 
-import com.jhl.admin.VO.UserVO;
+import com.jhl.admin.vo.UserVO;
 import com.jhl.admin.cache.DefendBruteForceAttackUser;
 import com.jhl.admin.model.Account;
 import com.jhl.admin.model.User;

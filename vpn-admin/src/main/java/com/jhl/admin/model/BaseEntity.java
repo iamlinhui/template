@@ -1,8 +1,7 @@
 package com.jhl.admin.model;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.jhl.admin.VO.VOI;
+import com.jhl.admin.vo.VOI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

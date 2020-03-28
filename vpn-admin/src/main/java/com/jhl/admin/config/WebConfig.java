@@ -2,7 +2,7 @@ package com.jhl.admin.config;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.google.common.collect.Lists;
-import com.jhl.admin.Interceptor.AuthInterceptor;
+import com.jhl.admin.interceptor.AuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;

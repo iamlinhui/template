@@ -1,12 +1,10 @@
 package com.jhl.admin.model;
 
-import com.jhl.admin.VO.UserVO;
-import com.jhl.admin.VO.VOI;
+import com.jhl.admin.vo.UserVO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Builder

@@ -2,7 +2,7 @@ package com.jhl.admin.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.jhl.admin.VO.UserVO;
+import com.jhl.admin.vo.UserVO;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -18,12 +18,17 @@ public class UserCache extends RootCache<String, UserVO> {
 
     @Override
     public UserVO getCache(String key) {
-        if (key ==null) return null;
+        if (key ==null) {
+            return null;
+        }
          Integer id = cacheManager.getIfPresent(key);
-         if (id !=null) return  userCacheManager.getIfPresent(id);
+         if (id !=null) {
+             return  userCacheManager.getIfPresent(id);
+         }
          return null;
     }
 
+    @Override
     public void setCache(String key, UserVO value) {
         Integer id = value.getId();
         cacheManager.put(key,id);

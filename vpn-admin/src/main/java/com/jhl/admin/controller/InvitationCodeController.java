@@ -1,8 +1,8 @@
 package com.jhl.admin.controller;
 
-import com.jhl.admin.Interceptor.PreAuth;
-import com.jhl.admin.VO.InvitationCodeVO;
-import com.jhl.admin.VO.UserVO;
+import com.jhl.admin.interceptor.PreAuth;
+import com.jhl.admin.vo.InvitationCodeVO;
+import com.jhl.admin.vo.UserVO;
 import com.jhl.admin.cache.UserCache;
 import com.jhl.admin.constant.enumObject.WebsiteConfigEnum;
 import com.jhl.admin.model.BaseEntity;

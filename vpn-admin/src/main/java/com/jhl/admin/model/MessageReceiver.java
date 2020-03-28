@@ -1,11 +1,7 @@
 package com.jhl.admin.model;
 
-import com.jhl.admin.VO.MessageReceiverVO;
-import com.jhl.admin.VO.MessageVO;
-import com.jhl.admin.VO.UserVO;
 import lombok.*;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.jhl.admin.VO;
+package com.jhl.admin.vo;
 
 /**
  * 标识为 VO类

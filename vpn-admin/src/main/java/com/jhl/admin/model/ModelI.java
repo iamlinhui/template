@@ -1,7 +1,5 @@
 package com.jhl.admin.model;
 
-import com.jhl.admin.VO.VOI;
-
 /**
  * 标识为Model类
  */

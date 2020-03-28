@@ -1,12 +1,7 @@
-package com.jhl.admin.VO;
+package com.jhl.admin.vo;
 
-import com.jhl.admin.model.BaseEntity;
-import com.jhl.admin.model.Message;
-import com.jhl.admin.model.User;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 @Builder

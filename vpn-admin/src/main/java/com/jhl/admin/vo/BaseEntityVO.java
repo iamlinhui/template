@@ -1,4 +1,4 @@
-package com.jhl.admin.VO;
+package com.jhl.admin.vo;
 
 import com.jhl.admin.model.ModelI;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
-import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.util.Date;
 

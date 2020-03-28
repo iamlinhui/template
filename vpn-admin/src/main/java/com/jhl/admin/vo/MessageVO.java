@@ -1,6 +1,5 @@
-package com.jhl.admin.VO;
+package com.jhl.admin.vo;
 
-import com.jhl.admin.model.MessageReceiver;
 import lombok.*;
 
 import java.io.Serializable;

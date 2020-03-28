@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jhl.admin.VO.UserVO;
+import com.jhl.admin.vo.UserVO;
 import com.jhl.admin.model.User;
 import org.junit.Test;
 

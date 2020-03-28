@@ -1,4 +1,4 @@
-package com.jhl.admin.VO;
+package com.jhl.admin.vo;
 
 import com.jhl.admin.model.Package;
 import lombok.AllArgsConstructor;

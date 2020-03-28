@@ -1,6 +1,7 @@
 package com.jhl.admin;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.jhl.admin.constant.ProxyConstant;
 import com.jhl.admin.util.SimpleJpaRepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.concurrent.*;
 @Slf4j
 @EnableScheduling
 @EnableAsync
+@EnableApolloConfig
 public class AdminApplication {
     @Autowired
     ProxyConstant proxyConstant;

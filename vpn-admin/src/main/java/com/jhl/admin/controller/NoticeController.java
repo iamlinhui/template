@@ -1,7 +1,7 @@
 package com.jhl.admin.controller;
 
-import com.jhl.admin.Interceptor.PreAuth;
-import com.jhl.admin.VO.NoticeVO;
+import com.jhl.admin.interceptor.PreAuth;
+import com.jhl.admin.vo.NoticeVO;
 import com.jhl.admin.model.Notice;
 import com.jhl.admin.repository.NoticeRepository;
 import com.ljh.common.model.Result;

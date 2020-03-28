@@ -1,6 +1,6 @@
 import com.alibaba.fastjson.JSON;
 import com.jhl.admin.AdminApplication;
-import com.jhl.admin.VO.UserVO;
+import com.jhl.admin.vo.UserVO;
 import com.jhl.admin.model.Message;
 import com.jhl.admin.model.User;
 import com.jhl.admin.repository.MessageRepository;

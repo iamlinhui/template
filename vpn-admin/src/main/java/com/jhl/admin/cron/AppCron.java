@@ -46,7 +46,9 @@ public class AppCron {
         Date today = new Date();
         log.info("构建下个stat任务。。开始，{}", today);
         List<Account> accounts = accountRepository.findByToDateAfter(today);
-        if (accounts == null) return;
+        if (accounts == null) {
+            return;
+        }
         accounts.forEach(account -> statService.createStat(account));
 
 
@@ -64,18 +66,26 @@ public class AppCron {
 
             Date toDate = account.getToDate();
             Integer userId = account.getUserId();
-            if (userId == null) return;
-            if (!toDate.after(now)) return;
+            if (userId == null) {
+                return;
+            }
+            if (!toDate.after(now)) {
+                return;
+            }
             if (toDate.getTime() - now.getTime() <= KVConstant.MS_OF_DAY * 3) {
                 User user = userService.get(userId);
-                if (user == null) return;
+                if (user == null) {
+                    return;
+                }
 
 
                 String email = user.getEmail();
 
                 EmailEventHistory latestHistory = emailService.findLatestHistory(email, EmailEventEnum.CHECK_OVERDUE_TO_DATE.name());
                 //检测 事件的 unlock date 如果未到unlock date 跳过
-                if (latestHistory != null && latestHistory.getUnlockDate().after(now)) return;
+                if (latestHistory != null && latestHistory.getUnlockDate().after(now)) {
+                    return;
+                }
 
                 emailService.sendEmail(email, "提醒：账号即将到期",
                         String.format(emailConstant.getOverdueDate(),sdf.format(toDate) ),
