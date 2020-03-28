@@ -6,7 +6,11 @@ import com.jhl.admin.constant.ProxyConstant;
 import com.jhl.admin.util.SimpleJpaRepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +26,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.TimeZone;
 import java.util.concurrent.*;
@@ -36,9 +41,16 @@ import java.util.concurrent.*;
 public class AdminApplication {
     @Autowired
     ProxyConstant proxyConstant;
+    @Value("${app.version}")
+    private  String version;
 
+    @PostConstruct
+    public void init()   {
+        System.err.println("v2ray-web-manager's version :" + version );
+    }
 
     public static void main(String[] args) {
+
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         SpringApplication.run(AdminApplication.class, args);
     }
@@ -61,7 +73,10 @@ public class AdminApplication {
     }
 
 
-   /* @Override
+
+
+
+/* @Override
     public void run(ApplicationArguments args) throws Exception {
       *//*  User newUser = User.builder().email("1@qq.com").nickName("test1").role("admin").password("1234").build();
         userRepository.save(newUser);*//*
