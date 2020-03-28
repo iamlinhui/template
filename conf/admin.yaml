@@ -39,13 +39,13 @@ server:
     min-threads: 2
 spring:
   datasource:
-    driver-class-name: org.sqlite.JDBC
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
     password: ''
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:sqlite:/opt/jar/db/admin.db
+    url: jdbc:mysql://foo
     username: ''
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -55,7 +55,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: com.jhl.admin.util.SQLiteDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
         enable_lazy_load_no_trans: true
         format_sql: ''
         show_sql: true
