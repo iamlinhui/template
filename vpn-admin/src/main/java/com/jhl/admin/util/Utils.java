@@ -64,7 +64,9 @@ public final class Utils {
     public static Date formatDate(Date date, SimpleDateFormat simpleDateFormat) {
         SimpleDateFormat thisSDF = sdf;
 
-        if (simpleDateFormat != null) thisSDF = simpleDateFormat;
+        if (simpleDateFormat != null) {
+            thisSDF = simpleDateFormat;
+        }
         try {
             return thisSDF.parse(thisSDF.format(date));
         } catch (ParseException e) {
