@@ -102,7 +102,9 @@ public class UserService {
         String password = user.getPassword();
         Validator.isNotNull(password, "密码为空");
         AtomicInteger tryCount = defendBruteForceAttackUser.getCache(email);
-        if (tryCount != null && tryCount.get() > 4) throw new RuntimeException("为了你的安全，账号已经被锁定，请在一个小时后重试/或者修改密码");
+        if (tryCount != null && tryCount.get() > Byte.SIZE) {
+            throw new RuntimeException("为了你的安全，账号已经被锁定，请在一个小时后重试/或者修改密码");
+        }
 
 
         Example<User> userExample = Example.of(User.builder().email(StringUtils.trim(email))

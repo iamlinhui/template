@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public abstract class BaseEntity implements Serializable,ModelI {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(updatable = false)
     @CreationTimestamp
