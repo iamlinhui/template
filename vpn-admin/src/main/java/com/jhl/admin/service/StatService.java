@@ -31,12 +31,14 @@ public class StatService {
                 Integer cycleNum = account.getCycle();
                 Date maxToDate = account.getToDate();
                 Date nextCycleDate = Utils.getDateBy(fromDate,cycleNum, Calendar.DAY_OF_YEAR);
-                    if (!maxToDate.after(fromDate)) return  null;
+                    if (!maxToDate.after(fromDate)) {
+                        return  null;
+                    }
                 stat = new Stat();
                  stat.setAccountId(account.getId());
                  stat.setFromDate(fromDate);
                  stat.setToDate(nextCycleDate);
-                 stat.setFlow(0l);
+                 stat.setFlow(0L);
                  statRepository.save(stat);
             }
             return stat;
