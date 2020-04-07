@@ -33,19 +33,15 @@ public class ServerConfigService {
     //if true  true ,else  false
     public boolean checkKey(String key) {
         ServerConfig serverConfig = serverConfigRepository.findOne(Example.of(ServerConfig.builder().key(key).build())).orElse(null);
-        if (serverConfig != null && serverConfig.getValue().equals("true")) return true;
-        else return false;
+        return serverConfig != null && "true".equals(serverConfig.getValue());
 
     }
 
     public boolean containKey(String key) {
         ServerConfig serverConfig = serverConfigRepository.findOne(Example.of(ServerConfig.builder().key(key).build())).orElse(null);
-        if (serverConfig == null) return false;
-        else return true;
+        return serverConfig != null;
     }
     public ServerConfig getServerConfig(String key){
-        ServerConfig serverConfig = serverConfigRepository.findOne(Example.of(ServerConfig.builder().key(key).build())).orElse(null);
-        if (serverConfig != null) return serverConfig;
-        return null;
+        return serverConfigRepository.findOne(Example.of(ServerConfig.builder().key(key).build())).orElse(null);
 
     }}

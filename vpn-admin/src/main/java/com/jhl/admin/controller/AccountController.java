@@ -162,7 +162,7 @@ public class AccountController {
     @GetMapping("/account")
     public Result list(Integer page, Integer pageSize, String userEmail) {
         List<Account> accounts = Lists.newArrayList();
-        long total = 0l;
+        long total;
         Date date = new Date();
         if (StringUtils.isBlank(userEmail)) {
             Page<Account> accountsPage = accountRepository.findAll(Example.of(Account.builder().build()),
