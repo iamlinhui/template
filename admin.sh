@@ -71,7 +71,7 @@ APOLLO="-Denv=dev
 
 OPTION="-Djava.library.path=/usr/local/apr/lib -Dnetworkaddress.cache.ttl=600 -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Duser.timezone=Asia/Shanghai -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8"
 VIRTUAL="-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xms40m -Xmx40m -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=80m"
-CMD="java -server -d64 $VIRTUAL $APOLLO $OPTION -jar $PROJECT_DIR/$JAR_FILE"
+CMD="java -server -d64 -Dserver.apr=true $VIRTUAL $APOLLO $OPTION -jar $PROJECT_DIR/$JAR_FILE"
 
 case "$1" in
     start)
