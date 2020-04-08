@@ -1,6 +1,7 @@
 package com.jhl.admin.service.v2ray;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.jhl.admin.model.Account;
 import com.jhl.admin.model.Server;
 import com.jhl.admin.model.User;
@@ -11,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -42,16 +45,19 @@ public class ProxyEventService {
     public void addProxyEvent(List<? extends ProxyEvent> proxyEvents) {
         for (ProxyEvent proxyEvent : proxyEvents) {
             try {
-                queue.offer(proxyEvent, 10, TimeUnit.SECONDS);
+                boolean succeeded = queue.offer(proxyEvent, 10, TimeUnit.SECONDS);
+                if (!succeeded) log.warn("can not add ProxyEvent: {} to queue", JSON.toJSONString(proxyEvent));
             } catch (InterruptedException e) {
                 log.error("addProxyEvent error", e);
+                Thread.currentThread().interrupt();
+
             }
         }
 
     }
 
     public void addProxyEvent(ProxyEvent proxyEvent) {
-        queue.offer(proxyEvent);
+        addProxyEvent(Arrays.asList(proxyEvent));
     }
 
     @PostConstruct
@@ -76,6 +82,8 @@ public class ProxyEventService {
                     }
                 } catch (InterruptedException e) {
                     log.error("event InterruptedException :{}", e);
+                    Thread.currentThread().interrupt();
+
                     break;
 
                 } catch (Exception e) {
@@ -100,6 +108,7 @@ public class ProxyEventService {
     }*/
 
     public List<V2RayProxyEvent> buildV2RayProxyEvent(Account account, String opName) {
+        Assert.notNull(account,"account is null");
         Integer serverId = account.getServerId();
         if (serverId == null) {
             Account builder = Account.builder().build();
@@ -107,9 +116,10 @@ public class ProxyEventService {
             account = accountRepository.findOne(Example.of(builder)).orElse(null);
         }
 
+        Assert.notNull(account,"account is null");
         Integer userId = account.getUserId();
         User user = userRepository.findById(userId).orElse(null);
-
+        Assert.notNull(user,"user is null");
         List<Server> servers = serverService.listByLevel(account.getLevel());
         List<V2RayProxyEvent> v2RayProxyEvents = new ArrayList<>(servers.size());
         for (Server server : servers)

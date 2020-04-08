@@ -1,5 +1,6 @@
 package com.jhl.task.service;
 
+import com.alibaba.fastjson.JSON;
 import com.jhl.constant.ManagerConstant;
 import com.jhl.task.TaskCondition;
 import com.jhl.task.inteface.AbstractTask;
@@ -30,7 +31,9 @@ public class TaskService<T extends AbstractTask> {
         if (t == null) return;
         if (IS_SHUTDOWN) throw new IllegalStateException(" The task service is closed");
         t.attachCondition();
-        REPORTER_QUEUE.offer(t);
+        boolean succeeded = REPORTER_QUEUE.offer(t);
+
+        if (!succeeded) log.warn("task :{},can not add to queue", JSON.toJSONString(t));
     }
 
 
@@ -69,9 +72,10 @@ public class TaskService<T extends AbstractTask> {
 
             } catch (InterruptedException e) {
                 //ignore
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 log.error("task thread error :{}", e);
-                abstractTask.catchException(e);
+             if (abstractTask!=null)  abstractTask.catchException(e);
             } catch (Error e) {
                 log.error(e.getMessage());
                 //跳过

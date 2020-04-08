@@ -19,7 +19,7 @@ public class V2rayProxyApplication {
 
     public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        SpringApplication.run(V2rayProxyApplication.class, args);
+        SpringApplication.run(V2rayProxyApplication.class);
     }
 
     @Bean
