@@ -146,13 +146,17 @@ public class ProxyAccountService {
             if (proxyAccountWrapper != null) {
                 Long pxVersion = proxyAccountWrapper.getVersion();
 
-                if (pxVersion != null && pxVersion.equals(ctxContextVersion)) result = false;
+                if (pxVersion != null && pxVersion.equals(ctxContextVersion)) {
+                    result = false;
+                }
             }
 
 
         } finally {
             //移除cache
-            if (result) rmProxyAccountCache(accountNo, host);
+            if (result) {
+                rmProxyAccountCache(accountNo, host);
+            }
         }
         return result;
 

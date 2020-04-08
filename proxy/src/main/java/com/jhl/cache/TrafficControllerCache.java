@@ -38,7 +38,9 @@ public class TrafficControllerCache {
         Assert.notNull(accountId, "accountId must not be null");
 
         GlobalTrafficShapingHandler trafficShapingHandler = ACCOUNT_TRAFFIC_HANDLER_MAP.getIfPresent(accountId);
-        if (trafficShapingHandler != null) return trafficShapingHandler;
+        if (trafficShapingHandler != null) {
+            return trafficShapingHandler;
+        }
 
         synchronized (SynchronizedInternerUtils.getInterner().intern(accountId + ":acquireGlobalTrafficShapingHandler")) {
             trafficShapingHandler = ACCOUNT_TRAFFIC_HANDLER_MAP.getIfPresent(accountId);

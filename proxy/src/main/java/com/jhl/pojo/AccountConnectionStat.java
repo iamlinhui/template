@@ -57,10 +57,14 @@ public class AccountConnectionStat {
                 hostCounter.remove(host);
             }
         } else {
-            if (count < 0) return;
+            if (count < 0) {
+                return;
+            }
             hostCount = new AtomicInteger(count);
             AtomicInteger old = hostCounter.putIfAbsent(host, hostCount);
-            if (old != null) old.addAndGet(count);
+            if (old != null) {
+                old.addAndGet(count);
+            }
 
         }
     }

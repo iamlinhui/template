@@ -22,14 +22,18 @@ public class TaskService<T extends AbstractTask> {
     @Autowired
     ManagerConstant managerConstant;
 
-    private static DelayQueue<AbstractTask> REPORTER_QUEUE = new DelayQueue<>();
+    private static final DelayQueue<AbstractTask> REPORTER_QUEUE = new DelayQueue<>();
     @Autowired
     RestTemplate restTemplate;
 
 
     public static <T extends AbstractTask> void addTask(T t) {
-        if (t == null) return;
-        if (IS_SHUTDOWN) throw new IllegalStateException(" The task service is closed");
+        if (t == null) {
+            return;
+        }
+        if (IS_SHUTDOWN) {
+            throw new IllegalStateException(" The task service is closed");
+        }
         t.attachCondition();
         boolean succeeded = REPORTER_QUEUE.offer(t);
 
@@ -53,7 +57,7 @@ public class TaskService<T extends AbstractTask> {
         while (true) {
             AbstractTask abstractTask = null;
             try {
-                if (IS_SHUTDOWN && REPORTER_QUEUE.size() <= 0) {
+                if (IS_SHUTDOWN && REPORTER_QUEUE.isEmpty()) {
                     break;
                 }
                 abstractTask = REPORTER_QUEUE.take();
@@ -70,7 +74,7 @@ public class TaskService<T extends AbstractTask> {
 
                 abstractTask.runTask(restTemplate, managerConstant);
 
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignore) {
                 //ignore
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
@@ -80,7 +84,9 @@ public class TaskService<T extends AbstractTask> {
                 log.error(e.getMessage());
                 //跳过
             } finally {
-                if (abstractTask != null) abstractTask.done();
+                if (abstractTask != null) {
+                    abstractTask.done();
+                }
             }
 
         }
@@ -92,7 +98,7 @@ public class TaskService<T extends AbstractTask> {
         IS_SHUTDOWN = true;
         workerThread.interrupt();
         Thread.sleep(100);
-        if (REPORTER_QUEUE.size() > 0) {
+        if (!REPORTER_QUEUE.isEmpty()) {
             Thread.sleep(5000);
             REPORTER_QUEUE.clear();
             workerThread.interrupt();

@@ -203,7 +203,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
     }
 
     private void release(ByteBuf msg) {
-        if (msg == null) return;
+        if (msg == null) {
+            return;
+        }
         ByteBuf byteBuf = msg;
         if (byteBuf.refCnt() > 0) {
             byteBuf.release(byteBuf.refCnt());
@@ -230,7 +232,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
         //50001:token/
         String[] accountNoAndToken = requestRow[1].split("/")[2].split(":");
 
-        if (accountNoAndToken.length < 2) throw new NullPointerException("旧版接入不在支持");
+        if (accountNoAndToken.length < 2) {
+            throw new NullPointerException("旧版接入不在支持");
+        }
 
         accountNo = accountNoAndToken[0];
 
@@ -376,7 +380,9 @@ public class Dispatcher extends ChannelInboundHandlerAdapter {
 
     private void checkToken(String requestToken) throws IllegalAccessException {
         String token = V2RayPathEncoder.encoder(accountNo, host, proxyConstant.getAuthPassword());
-        if (!requestToken.equals(token)) throw new IllegalAccessException("非法访问,token检测不通过");
+        if (!requestToken.equals(token)) {
+            throw new IllegalAccessException("非法访问,token检测不通过");
+        }
     }
 
     private String getAccountId() {
