@@ -1,7 +1,6 @@
 package com.jhl.admin.controller;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jhl.admin.cache.UserCache;
 import com.jhl.admin.constant.KVConstant;
 import com.jhl.admin.interceptor.PreAuth;
@@ -25,9 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @Slf4j
@@ -125,20 +122,5 @@ public class ServerController {
 
         //todo 修改服务器后的逻辑 1.更新账号2.推送到中间件
         return Result.builder().code(Result.CODE_SUCCESS).build();
-    }
-
-    @PreAuth("admin")
-    @ResponseBody
-    @GetMapping("/server/info")
-    public Result getServerInfo(@CookieValue(KVConstant.COOKIE_NAME) String auth) throws Exception {
-        List<Server> serverList = serverRepository.findAll();
-        if (serverList.isEmpty()) {
-            return Result.builder().code(Result.CODE_SUCCESS).build();
-        }
-        Map<ServerVO, Map> serverMap = Maps.newHashMap();
-        for (Server server : serverList) {
-
-        }
-        return Result.builder().code(Result.CODE_SUCCESS).obj(serverMap).build();
     }
 }
