@@ -1,17 +1,19 @@
 package com.jhl.admin.controller;
 
 import com.google.common.collect.Lists;
-import com.jhl.admin.interceptor.PreAuth;
-import com.jhl.admin.vo.AccountVO;
-import com.jhl.admin.vo.ServerVO;
-import com.jhl.admin.vo.UserVO;
+import com.google.common.collect.Maps;
 import com.jhl.admin.cache.UserCache;
 import com.jhl.admin.constant.KVConstant;
+import com.jhl.admin.interceptor.PreAuth;
 import com.jhl.admin.model.Server;
 import com.jhl.admin.repository.ServerRepository;
 import com.jhl.admin.service.AccountService;
 import com.jhl.admin.service.ServerService;
+import com.jhl.admin.service.rpc.BandHostService;
 import com.jhl.admin.util.Validator;
+import com.jhl.admin.vo.AccountVO;
+import com.jhl.admin.vo.ServerVO;
+import com.jhl.admin.vo.UserVO;
 import com.ljh.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Slf4j
@@ -36,6 +41,8 @@ public class ServerController {
     UserCache userCache;
     @Autowired
     AccountService accountService;
+    @Resource
+    private BandHostService bandHostService;
 
     @PreAuth("vip")
     @ResponseBody
@@ -43,7 +50,7 @@ public class ServerController {
     public Result get(@PathVariable Integer id) {
         Validator.isNotNull(id);
         Server server = serverRepository.findById(id).orElse(null);
-        return Result.builder().code(Result.CODE_SUCCESS).obj(server==null?null:server.toVO(ServerVO.class)).build();
+        return Result.builder().code(Result.CODE_SUCCESS).obj(server == null ? null : server.toVO(ServerVO.class)).build();
     }
 
     @PreAuth("admin")
@@ -53,10 +60,12 @@ public class ServerController {
         Validator.isNotNull(page);
         Validator.isNotNull(pageSize);
         Page<Server> all = serverRepository.findAll(Example.of(Server.builder().build()), PageRequest.of(page - 1, pageSize));
-        ;
         ArrayList<Object> VOList = Lists.newArrayListWithCapacity(all.getContent().size());
         all.getContent().forEach(server -> {
-            VOList.add(server.toVO(ServerVO.class));
+            ServerVO serverVO = server.toVO(ServerVO.class);
+            String serviceInfo = bandHostService.getLiveServiceInfo(server.getId());
+            serverVO.setUseCase(serviceInfo);
+            VOList.add(serverVO);
         });
         return Result.buildPageObject(all.getTotalElements(), VOList);
     }
@@ -112,9 +121,24 @@ public class ServerController {
         Validator.isNotNull(server);
 
 
-       serverService.update(server);
+        serverService.update(server);
 
         //todo 修改服务器后的逻辑 1.更新账号2.推送到中间件
         return Result.builder().code(Result.CODE_SUCCESS).build();
+    }
+
+    @PreAuth("admin")
+    @ResponseBody
+    @GetMapping("/server/info")
+    public Result getServerInfo(@CookieValue(KVConstant.COOKIE_NAME) String auth) throws Exception {
+        List<Server> serverList = serverRepository.findAll();
+        if (serverList.isEmpty()) {
+            return Result.builder().code(Result.CODE_SUCCESS).build();
+        }
+        Map<ServerVO, Map> serverMap = Maps.newHashMap();
+        for (Server server : serverList) {
+
+        }
+        return Result.builder().code(Result.CODE_SUCCESS).obj(serverMap).build();
     }
 }

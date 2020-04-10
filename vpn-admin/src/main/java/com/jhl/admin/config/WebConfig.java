@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.jhl.admin.interceptor.AuthInterceptor;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.coyote.http11.Http11AprProtocol;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -60,11 +61,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public ServletWebServerFactory servletWebServerFactory() {
 
-        LifecycleListener arpLifecycle = new AprLifecycleListener();
-
         TomcatServletWebServerFactory webServerFactory = new TomcatServletWebServerFactory();
-        webServerFactory.setProtocol("org.apache.coyote.http11.Http11AprProtocol");
-        webServerFactory.addContextLifecycleListeners(arpLifecycle);
+        webServerFactory.setProtocol(Http11AprProtocol.class.getName());
+        webServerFactory.addContextLifecycleListeners(new AprLifecycleListener());
 
         return webServerFactory;
     }
