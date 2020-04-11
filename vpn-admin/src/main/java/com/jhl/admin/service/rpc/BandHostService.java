@@ -52,7 +52,7 @@ public class BandHostService {
         try {
 
             UseCase useCase = USE_CASE_MAP.get(serverId);
-            if (useCase != null && DateUtils.addHours(new Date(), 1).compareTo(useCase.getCreateDate()) >= 0) {
+            if (useCase != null && DateUtils.addHours(useCase.getCreateDate(), 1).compareTo(new Date()) >= 0) {
                 return useCase.getUse();
             }
 
