@@ -94,7 +94,9 @@ public class ProxyController {
         //Integer serverId = account.getServerId();
 
         User user = userRepository.findById(userId).orElse(null);
-        if (user ==null) throw  new NullPointerException("user is null");
+        if (user ==null) {
+            throw  new NullPointerException("user is null");
+        }
         V2RayProxyEvent v2RayProxyEvent = new V2RayProxyEvent(null, server, account, user.getEmail(), null,v2rayAccountService);
         ProxyAccount proxyAccount = v2RayProxyEvent.buildProxyAccount();
 

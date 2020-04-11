@@ -3,22 +3,19 @@ package com.jhl.admin.service.rpc;
 import cn.promptness.core.HttpClientUtil;
 import cn.promptness.core.HttpResult;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.jhl.admin.model.ServerApiToken;
 import com.jhl.admin.repository.ServerApiTokenRepository;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lynn
@@ -33,7 +30,7 @@ public class BandHostService {
 
     private static final BigDecimal G = BigDecimal.valueOf(1024 * 1024 * 1024L);
 
-    private static final Map<Integer,UseCase> USE_CASE_MAP = Maps.newConcurrentMap();
+    Cache<Integer, String> cacheManager = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.HOURS).build();
 
     @Resource
     private ServerApiTokenRepository serverApiTokenRepository;
@@ -41,21 +38,15 @@ public class BandHostService {
     public String getLiveServiceInfo(Integer serverId) {
 
         ServerApiToken serverApiToken = serverApiTokenRepository.findByServerId(serverId);
-
-        if (serverApiToken == null) {
+        if (serverApiToken == null || StringUtils.isEmpty(serverApiToken.getApiKey()) || StringUtils.isEmpty(serverApiToken.getVersionId())) {
             return StringUtils.EMPTY;
         }
-
-        if (StringUtils.isEmpty(serverApiToken.getApiKey()) || StringUtils.isEmpty(serverApiToken.getVersionId())) {
-            return StringUtils.EMPTY;
+        String useCase = cacheManager.getIfPresent(serverId);
+        if (useCase != null) {
+            return useCase;
         }
 
         try {
-
-            UseCase useCase = USE_CASE_MAP.get(serverId);
-            if (useCase != null && DateUtils.addHours(useCase.getCreateDate(), 1).compareTo(new Date()) >= 0) {
-                return useCase.getUse();
-            }
 
             HttpResult httpResult = new HttpClientUtil().doGet(URL, ImmutableMap.of("veid", serverApiToken.getVersionId(), "api_key", serverApiToken.getApiKey()));
 
@@ -68,7 +59,7 @@ public class BandHostService {
             BigDecimal dataCounter = content.getBigDecimal("data_counter").divide(G, 2, RoundingMode.HALF_UP);
 
             String use = String.format("%sG/%sG", dataCounter, planMonthlyData);
-            USE_CASE_MAP.put(serverId, UseCase.builder().use(use).createDate(new Date()).build());
+            cacheManager.put(serverId, use);
             return use;
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -77,14 +68,5 @@ public class BandHostService {
 
     }
 
-    @Data
-    @Builder
-    static class UseCase{
-
-        private Date createDate;
-
-        private String use;
-
-    }
 
 }

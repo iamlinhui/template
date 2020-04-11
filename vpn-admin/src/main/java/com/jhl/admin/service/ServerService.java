@@ -45,14 +45,21 @@ public class ServerService {
      */
     public Server findByDomain(String domain, short level) {
         List<Server> all = serverRepository.findByLevelLessThanEqualAndStatusAndClientDomainOrderByLevelDesc(level, StatusEnum.SUCCESS.code(), domain);
-        if (all.size() != 1)
-            throw new IllegalArgumentException("1.存在多个相同域名，请删除重复的。2.查找返回为空 ;参数: domain" + domain + ",level:" + level);
+        if (all.isEmpty()) {
+            // 存在更换了服务器域名信息 这时候查询账号信息为空
+            throw new IllegalArgumentException("查找返回为空 ;参数: domain:" + domain + ",level:" + level);
+        }
+        if (all.size() > 1) {
+            throw new IllegalArgumentException("存在多个相同域名，请删除重复的");
+        }
         Server server = all.get(0);
         return server;
     }
 
     public Server findByIdAndStatus(Integer id, Integer status){
-        if (status==null) status= StatusEnum.SUCCESS.code();
+        if (status==null) {
+            status= StatusEnum.SUCCESS.code();
+        }
         Server server = serverRepository.findById(id).orElse(null);
         if (server !=null && !server.getStatus().equals(status)){
             server =null;

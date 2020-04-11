@@ -126,10 +126,14 @@ public class ReportController {
     @GetMapping("/connectionLimit")
     public Result exceedsMaxConnection(String accountNo) {
 
-        if (StringUtils.isBlank(accountNo)) return Result.doSuccess();
+        if (StringUtils.isBlank(accountNo)) {
+            return Result.doSuccess();
+        }
 
         Account account = accountService.findByAccountNo(accountNo);
-        if (account == null) return Result.doSuccess();
+        if (account == null) {
+            return Result.doSuccess();
+        }
 
         Integer userId = account.getUserId();
         User user = userService.get(userId);
