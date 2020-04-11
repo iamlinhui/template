@@ -5,11 +5,14 @@ import com.jhl.admin.constant.KVConstant;
 import com.jhl.admin.constant.enumObject.EmailEventEnum;
 import com.jhl.admin.model.Account;
 import com.jhl.admin.model.EmailEventHistory;
+import com.jhl.admin.model.Server;
 import com.jhl.admin.model.User;
 import com.jhl.admin.repository.AccountRepository;
+import com.jhl.admin.repository.ServerRepository;
 import com.jhl.admin.service.EmailService;
 import com.jhl.admin.service.StatService;
 import com.jhl.admin.service.UserService;
+import com.jhl.admin.service.rpc.BandHostService;
 import com.jhl.admin.service.v2ray.ProxyEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -101,5 +106,22 @@ public class AppCron {
 
         });
 
+    }
+
+    @Resource
+    private ServerRepository serverRepository;
+    @Resource
+    private BandHostService bandHostService;
+
+    @PostConstruct
+    @Async
+    @Scheduled(cron = "0 0 */1 * * ?")
+    public void initUseCase() {
+        log.info("开始刷新服务使用流量情况");
+        List<Server> serverList = serverRepository.findAll();
+        for (Server server : serverList) {
+            bandHostService.getLiveServiceInfo(server.getId());
+        }
+        log.info("刷新服务使用流量情况结束");
     }
 }
