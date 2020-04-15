@@ -115,7 +115,7 @@ public class AppCron {
 
     @PostConstruct
     @Async
-    @Scheduled(cron = "0 0 */1 * * ?")
+    @Scheduled(cron = "0 */30 * * * ?")
     public void initUseCase() {
         log.info("开始刷新服务使用流量情况");
         List<Server> serverList = serverRepository.findAll();
