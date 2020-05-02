@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -26,16 +27,24 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     AuthInterceptor authInterceptor;
 
+    @Autowired
+    FastJsonHttpMessageConverter fastJsonHttpMessageConverter;
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(0, fastJsonHttpMessageConverter);
+
+    }
+
+    @Bean
+    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter() {
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         fastJsonHttpMessageConverter.setSupportedMediaTypes(Lists.newArrayList(MediaType.APPLICATION_JSON));
-        converters.add(0,fastJsonHttpMessageConverter);
-
+        return fastJsonHttpMessageConverter;
     }
 
     /**
      * 拦截器
+     *
      * @param registry
      */
     @Override

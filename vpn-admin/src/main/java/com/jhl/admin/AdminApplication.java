@@ -12,11 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -44,18 +40,15 @@ public class AdminApplication {
 
 
     @Bean
-    public RestTemplate restTemplate() {
+    public RestTemplate restTemplate(FastJsonHttpMessageConverter fastJsonHttpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(new ClientHttpRequestInterceptor() {
-            @Override
-            public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-                HttpHeaders headers = request.getHeaders();
-                headers.add("Authorization", DigestUtils.md5Hex(proxyConstant.getAuthPassword()));
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                return execution.execute(request, body);
-            }
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            HttpHeaders headers = request.getHeaders();
+            headers.add("Authorization", DigestUtils.md5Hex(proxyConstant.getAuthPassword()));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return execution.execute(request, body);
         });
-        restTemplate.getMessageConverters().add(new FastJsonHttpMessageConverter());
+        restTemplate.getMessageConverters().add(fastJsonHttpMessageConverter);
         return restTemplate;
     }
 
