@@ -51,10 +51,8 @@ public class AppCron {
         Date today = new Date();
         log.info("构建下个stat任务。。开始，{}", today);
         List<Account> accounts = accountRepository.findByToDateAfter(today);
-        if (accounts == null) {
-            return;
-        }
-        accounts.forEach(account -> statService.createStat(account));
+        if (accounts == null) return;
+        accounts.forEach(account -> statService.createOrGetStat(account));
 
 
     }

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Slf4j
 @Service
@@ -51,7 +50,7 @@ public class AdminInitService {
         Date date = Utils.formatDate( new Date(), null);
         ac.setToDate(Utils.getDateBy(date,365, Calendar.DAY_OF_YEAR));
         accountService.create(ac);
-        statService.createStat(ac);
+        statService.createOrGetStat(ac);
         initialedConfig =new ServerConfig();
         initialedConfig.setKey("initialed");
         initialedConfig.setValue("true");

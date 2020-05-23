@@ -27,6 +27,8 @@ import java.util.TimeZone;
 @Slf4j
 @EnableScheduling
 @EnableAsync
+public class AdminApplication   {
+
 @EnableApolloConfig
 public class AdminApplication {
     @Autowired
@@ -39,18 +41,22 @@ public class AdminApplication {
     }
 
 
-    @Bean
-    public RestTemplate restTemplate(FastJsonHttpMessageConverter fastJsonHttpMessageConverter) {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add((request, body, execution) -> {
-            HttpHeaders headers = request.getHeaders();
-            headers.add("Authorization", DigestUtils.md5Hex(proxyConstant.getAuthPassword()));
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return execution.execute(request, body);
-        });
-        restTemplate.getMessageConverters().add(fastJsonHttpMessageConverter);
-        return restTemplate;
-    }
+
+
+
+
+
+
+/* @Override
+    public void run(ApplicationArguments args) throws Exception {
+      *//*  User newUser = User.builder().email("1@qq.com").nickName("test1").role("admin").password("1234").build();
+        userRepository.save(newUser);*//*
+
+         User u = userRepository.findById(4).get();
+        System.out.println(u);
+        System.out.println("run");
+    }*/
+
 
 }
 
