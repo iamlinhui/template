@@ -2,7 +2,6 @@ package com.jhl.admin.config;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.google.common.collect.Lists;
-import com.jhl.admin.Interceptor.AuthInterceptor;
 import com.jhl.admin.constant.ProxyConstant;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.jhl.admin.interceptor.AuthInterceptor;
